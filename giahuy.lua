@@ -1,6 +1,11 @@
---==[ SCRIPT FIX LAG + BOX RGB + FPS RGB ]==--
+--==[ SCRIPT FIX LAG + RGB BOX + TÊN + FPS + NHẠC MỚI ]==--
 
--- ⚡ Xóa hiệu ứng (giữ BillboardGui tên của Roblox)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+local LocalPlayer = Players.LocalPlayer
+
+-- ⚡ Xóa hiệu ứng (giữ lại BillboardGui tên)
 for _, obj in pairs(workspace:GetDescendants()) do
     if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Fire") 
     or obj:IsA("Smoke") or obj:IsA("Explosion") or obj:IsA("Beam") then
@@ -26,16 +31,21 @@ workspace.DescendantAdded:Connect(function(obj)
 end)
 
 -- ⚡ Xóa skin người chơi (giữ BillboardGui tên)
-for _, plr in pairs(game.Players:GetPlayers()) do
-    if plr.Character then
-        for _, part in pairs(plr.Character:GetChildren()) do
-            if part:IsA("Accessory") or part:IsA("Shirt") or part:IsA("Pants") or part:IsA("ShirtGraphic") then
-                part:Destroy()
-            elseif (part:IsA("MeshPart") or part:IsA("Part")) and part.Name ~= "HumanoidRootPart" then
-                part.Transparency = 1
-            end
+local function clearCharacter(char)
+    for _, part in pairs(char:GetChildren()) do
+        if part:IsA("Accessory") or part:IsA("Shirt") or part:IsA("Pants") or part:IsA("ShirtGraphic") then
+            part:Destroy()
+        elseif (part:IsA("MeshPart") or part:IsA("Part")) and part.Name ~= "HumanoidRootPart" then
+            part.Transparency = 1
         end
     end
+end
+
+for _, plr in pairs(Players:GetPlayers()) do
+    if plr.Character then clearCharacter(plr.Character) end
+    plr.CharacterAdded:Connect(function(char)
+        clearCharacter(char)
+    end)
 end
 
 -- ⚡ Xóa toàn bộ âm thanh cũ
@@ -48,30 +58,24 @@ local function clearSounds(parent)
 end
 
 clearSounds(workspace)
-clearSounds(game:GetService("SoundService"))
+clearSounds(SoundService)
 clearSounds(game:GetService("ReplicatedStorage"))
-clearSounds(game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+clearSounds(LocalPlayer:WaitForChild("PlayerGui"))
 
 -- ⚡ Phát nhạc loop mới
-local SoundService = game:GetService("SoundService")
 local music = Instance.new("Sound", SoundService)
 music.SoundId = "rbxassetid://87233041213837"
 music.Looped = true
-music.Volume = 1
+music.Volume = 3
 music:Play()
 
--- ⚡ Hiển thị FPS (nhỏ + RGB)
-local RunService = game:GetService("RunService")
-local player = game.Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
-
+-- ⚡ Hiển thị FPS
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 local FpsLabel = Instance.new("TextLabel", ScreenGui)
-
-FpsLabel.Size = UDim2.new(0, 80, 0, 15)
-FpsLabel.Position = UDim2.new(0.5, -40, 0, 0) -- sát trên màn hình
+FpsLabel.Size = UDim2.new(0, 80, 0, 20)
+FpsLabel.Position = UDim2.new(0.5, -60, 0, 0)
 FpsLabel.BackgroundTransparency = 1
-FpsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 FpsLabel.TextStrokeTransparency = 0
 FpsLabel.TextScaled = true
 FpsLabel.Font = Enum.Font.SourceSansBold
@@ -79,58 +83,55 @@ FpsLabel.Font = Enum.Font.SourceSansBold
 local lastUpdate = tick()
 local frames = 0
 local hueFPS = 0
-
 RunService.RenderStepped:Connect(function()
     frames += 1
     if tick() - lastUpdate >= 1 then
-        FpsLabel.Text = "FPS: " .. tostring(frames)
+        FpsLabel.Text = "FPS: "..frames
         frames = 0
         lastUpdate = tick()
     end
-    -- Đổi màu RGB cho FPS
     hueFPS = (hueFPS + 1) % 360
     FpsLabel.TextColor3 = Color3.fromHSV(hueFPS/360, 1, 1)
 end)
 
--- ⚡ Ô vuông RGB quanh player + tên nhỏ trên box
+-- ⚡ Ô vuông RGB + Tên nhỏ trên ô
 local function createBox(char, plr)
-    if char:FindFirstChild("HumanoidRootPart") and not char:FindFirstChild("RGBBox") then
-        local hrp = char.HumanoidRootPart
+    local hrp = char:WaitForChild("HumanoidRootPart", 5)
+    if not hrp or hrp:FindFirstChild("RGBBox") then return end
 
-        -- Box nhỏ hơn 1/2
-        local box = Instance.new("BoxHandleAdornment")
-        box.Name = "RGBBox"
-        box.Adornee = hrp
-        box.Size = Vector3.new(3, 3, 1.5) -- nhỏ hơn
-        box.AlwaysOnTop = true
-        box.ZIndex = 10
-        box.Transparency = 0.3
-        box.Parent = hrp
+    -- Box RGB
+    local box = Instance.new("BoxHandleAdornment")
+    box.Name = "RGBBox"
+    box.Adornee = hrp
+    box.Size = Vector3.new(2, 2, 1)
+    box.AlwaysOnTop = true
+    box.ZIndex = 10
+    box.Transparency = 0.5
+    box.Parent = hrp
 
-        -- Tên nhỏ trên box
-        local billboard = Instance.new("BillboardGui")
-        billboard.Name = "MiniName"
-        billboard.Adornee = hrp
-        billboard.Size = UDim2.new(0,100,0,20)
-        billboard.StudsOffset = Vector3.new(0,2.5,0)
-        billboard.AlwaysOnTop = true
-        billboard.Parent = hrp
+    -- Tên nhỏ trên ô
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "PlayerName"
+    billboard.Adornee = hrp
+    billboard.Size = UDim2.new(0,100,0,20)
+    billboard.StudsOffset = Vector3.new(0,3,0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = hrp
 
-        local text = Instance.new("TextLabel", billboard)
-        text.Size = UDim2.new(1,0,1,0)
-        text.BackgroundTransparency = 1
-        text.Text = plr.Name
-        text.TextColor3 = Color3.fromRGB(255,255,255)
-        text.TextStrokeTransparency = 0
-        text.TextScaled = true
-        text.Font = Enum.Font.SourceSansBold
-    end
+    local text = Instance.new("TextLabel", billboard)
+    text.Size = UDim2.new(1,0,1,0)
+    text.BackgroundTransparency = 1
+    text.Text = plr.Name
+    text.TextColor3 = Color3.fromRGB(255,255,255) -- không RGB
+    text.TextStrokeTransparency = 0
+    text.TextScaled = true
+    text.Font = Enum.Font.SourceSansBold
 end
 
-for _, plr in pairs(game.Players:GetPlayers()) do
+-- Tạo box cho tất cả player hiện tại và khi spawn
+for _, plr in pairs(Players:GetPlayers()) do
     if plr.Character then createBox(plr.Character, plr) end
     plr.CharacterAdded:Connect(function(char)
-        char:WaitForChild("HumanoidRootPart")
         createBox(char, plr)
     end)
 end
@@ -139,17 +140,11 @@ end
 local hue = 0
 RunService.RenderStepped:Connect(function()
     hue = (hue + 1) % 360
-    local color = Color3.fromHSV(hue/360, 1, 1)
-    for _, plr in pairs(game.Players:GetPlayers()) do
+    local color = Color3.fromHSV(hue/360,1,1)
+    for _, plr in pairs(Players:GetPlayers()) do
         if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
             local box = plr.Character.HumanoidRootPart:FindFirstChild("RGBBox")
-            if box then
-                box.Color3 = color
-            end
-            local billboard = plr.Character.HumanoidRootPart:FindFirstChild("MiniName")
-            if billboard and billboard:FindFirstChild("TextLabel") then
-                billboard.TextLabel.TextColor3 = color
-            end
+            if box then box.Color3 = color end
         end
     end
 end)
