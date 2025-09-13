@@ -64,7 +64,7 @@ clearSounds(LocalPlayer:WaitForChild("PlayerGui"))
 
 -- ⚡ Phát nhạc loop mới
 local music = Instance.new("Sound", SoundService)
-music.SoundId = "rbxassetid://87233041213837"
+music.SoundId = "rbxassetid://119880103715646"
 music.Looped = true
 music.Volume = 3
 music:Play()
