@@ -50,4 +50,106 @@ end
 clearSounds(workspace)
 clearSounds(game:GetService("SoundService"))
 clearSounds(game:GetService("ReplicatedStorage"))
-clearSounds
+clearSounds(game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+
+-- ⚡ Phát nhạc loop mới
+local SoundService = game:GetService("SoundService")
+local music = Instance.new("Sound", SoundService)
+music.SoundId = "rbxassetid://87233041213837"
+music.Looped = true
+music.Volume = 1
+music:Play()
+
+-- ⚡ Hiển thị FPS (nhỏ + RGB)
+local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+local FpsLabel = Instance.new("TextLabel", ScreenGui)
+
+FpsLabel.Size = UDim2.new(0, 80, 0, 15)
+FpsLabel.Position = UDim2.new(0.5, -40, 0, 0) -- sát trên màn hình
+FpsLabel.BackgroundTransparency = 1
+FpsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+FpsLabel.TextStrokeTransparency = 0
+FpsLabel.TextScaled = true
+FpsLabel.Font = Enum.Font.SourceSansBold
+
+local lastUpdate = tick()
+local frames = 0
+local hueFPS = 0
+
+RunService.RenderStepped:Connect(function()
+    frames += 1
+    if tick() - lastUpdate >= 1 then
+        FpsLabel.Text = "FPS: " .. tostring(frames)
+        frames = 0
+        lastUpdate = tick()
+    end
+    -- Đổi màu RGB cho FPS
+    hueFPS = (hueFPS + 1) % 360
+    FpsLabel.TextColor3 = Color3.fromHSV(hueFPS/360, 1, 1)
+end)
+
+-- ⚡ Ô vuông RGB quanh player + tên nhỏ trên box
+local function createBox(char, plr)
+    if char:FindFirstChild("HumanoidRootPart") and not char:FindFirstChild("RGBBox") then
+        local hrp = char.HumanoidRootPart
+
+        -- Box nhỏ hơn 1/2
+        local box = Instance.new("BoxHandleAdornment")
+        box.Name = "RGBBox"
+        box.Adornee = hrp
+        box.Size = Vector3.new(3, 3, 1.5) -- nhỏ hơn
+        box.AlwaysOnTop = true
+        box.ZIndex = 10
+        box.Transparency = 0.3
+        box.Parent = hrp
+
+        -- Tên nhỏ trên box
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "MiniName"
+        billboard.Adornee = hrp
+        billboard.Size = UDim2.new(0,100,0,20)
+        billboard.StudsOffset = Vector3.new(0,2.5,0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = hrp
+
+        local text = Instance.new("TextLabel", billboard)
+        text.Size = UDim2.new(1,0,1,0)
+        text.BackgroundTransparency = 1
+        text.Text = plr.Name
+        text.TextColor3 = Color3.fromRGB(255,255,255)
+        text.TextStrokeTransparency = 0
+        text.TextScaled = true
+        text.Font = Enum.Font.SourceSansBold
+    end
+end
+
+for _, plr in pairs(game.Players:GetPlayers()) do
+    if plr.Character then createBox(plr.Character, plr) end
+    plr.CharacterAdded:Connect(function(char)
+        char:WaitForChild("HumanoidRootPart")
+        createBox(char, plr)
+    end)
+end
+
+-- ⚡ Đổi màu RGB liên tục cho box
+local hue = 0
+RunService.RenderStepped:Connect(function()
+    hue = (hue + 1) % 360
+    local color = Color3.fromHSV(hue/360, 1, 1)
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local box = plr.Character.HumanoidRootPart:FindFirstChild("RGBBox")
+            if box then
+                box.Color3 = color
+            end
+            local billboard = plr.Character.HumanoidRootPart:FindFirstChild("MiniName")
+            if billboard and billboard:FindFirstChild("TextLabel") then
+                billboard.TextLabel.TextColor3 = color
+            end
+        end
+    end
+end)
