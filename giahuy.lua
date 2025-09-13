@@ -1,11 +1,11 @@
 --==[ SCRIPT FIX LAG + RGB BOX + FPS ]==--
 
--- ⚡ Xóa hiệu ứng
+-- ⚡ Xóa hiệu ứng (giữ lại BillboardGui để còn thấy tên)
 for _, obj in pairs(workspace:GetDescendants()) do
     if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Fire") 
     or obj:IsA("Smoke") or obj:IsA("Explosion") or obj:IsA("Beam") then
         obj:Destroy()
-    elseif obj:IsA("SurfaceGui") or obj:IsA("BillboardGui") then
+    elseif obj:IsA("SurfaceGui") then
         obj.Enabled = false
     elseif obj:IsA("Decal") then
         obj.Texture = ""
@@ -20,10 +20,12 @@ workspace.DescendantAdded:Connect(function(obj)
         obj:Destroy()
     elseif obj:IsA("Decal") then
         obj.Texture = ""
+    elseif obj:IsA("SurfaceGui") then
+        obj.Enabled = false
     end
 end)
 
--- ⚡ Xóa skin người chơi + NPC
+-- ⚡ Xóa skin người chơi (nhưng giữ BillboardGui tên)
 for _, plr in pairs(game.Players:GetPlayers()) do
     if plr.Character then
         for _, part in pairs(plr.Character:GetChildren()) do
@@ -84,7 +86,7 @@ local function createBox(char)
         local box = Instance.new("BoxHandleAdornment")
         box.Name = "RGBBox"
         box.Adornee = char.HumanoidRootPart
-        box.Size = Vector3.new(6, 6, 3) -- ô vuông vừa phải
+        box.Size = Vector3.new(6, 6, 3)
         box.AlwaysOnTop = true
         box.ZIndex = 10
         box.Transparency = 0.3
