@@ -1,4 +1,4 @@
---==[ SCRIPT FIX LAG + RGB BOX + FPS ]==--
+--==[ SCRIPT FIX LAG + RGB BOX + FPS + NHẠC MỚI ]==--
 
 -- ⚡ Xóa hiệu ứng (giữ lại BillboardGui để còn thấy tên)
 for _, obj in pairs(workspace:GetDescendants()) do
@@ -38,14 +38,21 @@ for _, plr in pairs(game.Players:GetPlayers()) do
     end
 end
 
--- ⚡ Xóa toàn bộ âm thanh
-for _, s in pairs(workspace:GetDescendants()) do
-    if s:IsA("Sound") then
-        s:Destroy()
+-- ⚡ Xóa toàn bộ âm thanh cũ (mọi nơi)
+local function clearSounds(parent)
+    for _, s in pairs(parent:GetDescendants()) do
+        if s:IsA("Sound") then
+            s:Destroy()
+        end
     end
 end
 
--- ⚡ Phát nhạc loop
+clearSounds(workspace)
+clearSounds(game:GetService("SoundService"))
+clearSounds(game:GetService("ReplicatedStorage"))
+clearSounds(game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+
+-- ⚡ Phát nhạc loop (mới)
 local SoundService = game:GetService("SoundService")
 local music = Instance.new("Sound", SoundService)
 music.SoundId = "rbxassetid://87233041213837"
