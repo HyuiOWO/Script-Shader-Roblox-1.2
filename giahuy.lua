@@ -86,7 +86,7 @@ local function createBox(char)
         local box = Instance.new("BoxHandleAdornment")
         box.Name = "RGBBox"
         box.Adornee = char.HumanoidRootPart
-        box.Size = Vector3.new(6, 6, 3)
+        box.Size = Vector3.new(3, 3, 3)
         box.AlwaysOnTop = true
         box.ZIndex = 10
         box.Transparency = 0.3
