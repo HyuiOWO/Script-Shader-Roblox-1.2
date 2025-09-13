@@ -1,4 +1,4 @@
---==[ SCRIPT FIX LAG FULL + Ô VUÔNG RGB HIỂN THỊ NGƯỜI CHƠI ]==--
+--==[ SCRIPT FIX LAG + RGB BOX + FPS ]==--
 
 -- ⚡ Xóa hiệu ứng
 for _, obj in pairs(workspace:GetDescendants()) do
@@ -29,24 +29,8 @@ for _, plr in pairs(game.Players:GetPlayers()) do
         for _, part in pairs(plr.Character:GetChildren()) do
             if part:IsA("Accessory") or part:IsA("Shirt") or part:IsA("Pants") or part:IsA("ShirtGraphic") then
                 part:Destroy()
-            elseif part:IsA("MeshPart") or part:IsA("Part") then
-                if part.Name ~= "HumanoidRootPart" then
-                    part.Transparency = 1
-                end
-            end
-        end
-    end
-end
-
-for _, npc in pairs(workspace:GetDescendants()) do
-    if npc:IsA("Model") and npc:FindFirstChild("Humanoid") then
-        for _, part in pairs(npc:GetChildren()) do
-            if part:IsA("Accessory") or part:IsA("Shirt") or part:IsA("Pants") then
-                part:Destroy()
-            elseif part:IsA("MeshPart") or part:IsA("Part") then
-                if part.Name ~= "HumanoidRootPart" then
-                    part.Transparency = 1
-                end
+            elseif (part:IsA("MeshPart") or part:IsA("Part")) and part.Name ~= "HumanoidRootPart" then
+                part.Transparency = 1
             end
         end
     end
@@ -67,7 +51,7 @@ music.Looped = true
 music.Volume = 1
 music:Play()
 
--- ⚡ Hiển thị FPS (sát trên màn hình, cập nhật mỗi giây)
+-- ⚡ Hiển thị FPS
 local RunService = game:GetService("RunService")
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
@@ -75,8 +59,8 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 local FpsLabel = Instance.new("TextLabel", ScreenGui)
 
-FpsLabel.Size = UDim2.new(0, 100, 0, 20)
-FpsLabel.Position = UDim2.new(0.5, -50, 0, 0) -- sát trên màn hình
+FpsLabel.Size = UDim2.new(0, 120, 0, 20)
+FpsLabel.Position = UDim2.new(0.5, -60, 0, 0) -- lên sát mép trên
 FpsLabel.BackgroundTransparency = 1
 FpsLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
 FpsLabel.TextStrokeTransparency = 0
@@ -94,35 +78,39 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- ⚡ Ô vuông RGB hiển thị player
-local Players = game:GetService("Players")
+-- ⚡ Ô vuông RGB quanh player
+local function createBox(char)
+    if char:FindFirstChild("HumanoidRootPart") and not char:FindFirstChild("RGBBox") then
+        local box = Instance.new("BoxHandleAdornment")
+        box.Name = "RGBBox"
+        box.Adornee = char.HumanoidRootPart
+        box.Size = Vector3.new(6, 6, 3) -- ô vuông vừa phải
+        box.AlwaysOnTop = true
+        box.ZIndex = 10
+        box.Transparency = 0.3
+        box.Parent = char.HumanoidRootPart
+    end
+end
 
-local function addBox(plr)
-    if plr == player then return end
+for _, plr in pairs(game.Players:GetPlayers()) do
+    if plr.Character then createBox(plr.Character) end
     plr.CharacterAdded:Connect(function(char)
-        task.wait(1)
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            local box = Instance.new("BoxHandleAdornment")
-            box.Adornee = hrp
-            box.AlwaysOnTop = true
-            box.Size = Vector3.new(2, 5, 1) -- vừa người
-            box.Transparency = 0.5
-            box.ZIndex = 0
-            box.Parent = hrp
-
-            -- RGB đổi màu
-            task.spawn(function()
-                while char.Parent and hrp.Parent and box.Parent do
-                    RunService.RenderStepped:Wait()
-                    box.Color3 = Color3.fromHSV((tick() % 5) / 5, 1, 1)
-                end
-            end)
-        end
+        char:WaitForChild("HumanoidRootPart")
+        createBox(char)
     end)
 end
 
-for _, plr in pairs(Players:GetPlayers()) do
-    addBox(plr)
-end
-Players.PlayerAdded:Connect(addBox)
+-- ⚡ Đổi màu RGB liên tục
+local hue = 0
+RunService.RenderStepped:Connect(function()
+    hue = (hue + 1) % 360
+    local color = Color3.fromHSV(hue/360, 1, 1)
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local box = plr.Character.HumanoidRootPart:FindFirstChild("RGBBox")
+            if box then
+                box.Color3 = color
+            end
+        end
+    end
+end)
