@@ -1,4 +1,4 @@
---==[ SCRIPT FIX LAG + RGB BOX + TÊN + FPS + NHẠC MỚI ]==--
+--==[ SCRIPT FIX LAG + RGB BOX + TÊN + FPS + NHẠC MỚI + XÓA SKIN LIÊN TỤC ]==--
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -30,24 +30,6 @@ workspace.DescendantAdded:Connect(function(obj)
     end
 end)
 
--- ⚡ Xóa skin người chơi (giữ BillboardGui tên)
-local function clearCharacter(char)
-    for _, part in pairs(char:GetChildren()) do
-        if part:IsA("Accessory") or part:IsA("Shirt") or part:IsA("Pants") or part:IsA("ShirtGraphic") then
-            part:Destroy()
-        elseif (part:IsA("MeshPart") or part:IsA("Part")) and part.Name ~= "HumanoidRootPart" then
-            part.Transparency = 1
-        end
-    end
-end
-
-for _, plr in pairs(Players:GetPlayers()) do
-    if plr.Character then clearCharacter(plr.Character) end
-    plr.CharacterAdded:Connect(function(char)
-        clearCharacter(char)
-    end)
-end
-
 -- ⚡ Xóa toàn bộ âm thanh cũ
 local function clearSounds(parent)
     for _, s in pairs(parent:GetDescendants()) do
@@ -64,7 +46,7 @@ clearSounds(LocalPlayer:WaitForChild("PlayerGui"))
 
 -- ⚡ Phát nhạc loop mới
 local music = Instance.new("Sound", SoundService)
-music.SoundId = "rbxassetid://119880103715646"
+music.SoundId = "rbxassetid://88663628557954"
 music.Looped = true
 music.Volume = 3
 music:Play()
@@ -128,7 +110,6 @@ local function createBox(char, plr)
     text.Font = Enum.Font.SourceSansBold
 end
 
--- Tạo box cho tất cả player hiện tại và khi spawn
 for _, plr in pairs(Players:GetPlayers()) do
     if plr.Character then createBox(plr.Character, plr) end
     plr.CharacterAdded:Connect(function(char)
@@ -148,3 +129,24 @@ RunService.RenderStepped:Connect(function()
         end
     end
 end)
+
+-- ⚡ Xóa skin liên tục nhưng nhẹ nhàng (0.5s 1 lần)
+local function clearAllPlayersSkin()
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr.Character then
+            for _, part in pairs(plr.Character:GetChildren()) do
+                if part:IsA("Accessory") or part:IsA("Shirt") or part:IsA("Pants") or part:IsA("ShirtGraphic") then
+                    part:Destroy()
+                elseif (part:IsA("MeshPart") or part:IsA("Part")) and part.Name ~= "HumanoidRootPart" then
+                    part.Transparency = 1
+                end
+            end
+        end
+    end
+end
+
+-- Tạo loop nhẹ nhàng để xóa skin
+while true do
+    clearAllPlayersSkin()
+    task.wait(1) -- 0.5s 1 lần, không lag
+end
