@@ -68,7 +68,7 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 local FpsLabel = Instance.new("TextLabel", ScreenGui)
 
-FpsLabel.Size = UDim2.new(0, 100, 0, 20)
+FpsLabel.Size = UDim2.new(0, 50, 0, 20)
 FpsLabel.Position = UDim2.new(0.5, -60, 0, 0) -- lên sát mép trên
 FpsLabel.BackgroundTransparency = 1
 FpsLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
