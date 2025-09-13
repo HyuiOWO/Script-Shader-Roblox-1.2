@@ -68,7 +68,7 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 local FpsLabel = Instance.new("TextLabel", ScreenGui)
 
-FpsLabel.Size = UDim2.new(0, 120, 0, 20)
+FpsLabel.Size = UDim2.new(0, 100, 0, 20)
 FpsLabel.Position = UDim2.new(0.5, -60, 0, 0) -- lên sát mép trên
 FpsLabel.BackgroundTransparency = 1
 FpsLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
@@ -81,7 +81,7 @@ local frames = 0
 RunService.RenderStepped:Connect(function()
     frames = frames + 1
     if tick() - lastUpdate >= 1 then
-        FpsLabel.Text = "FPS: " .. tostring(frames)
+        FpsLabel.Text = "fixlagHyui:" .. tostring(frames)
         frames = 0
         lastUpdate = tick()
     end
@@ -93,7 +93,7 @@ local function createBox(char)
         local box = Instance.new("BoxHandleAdornment")
         box.Name = "RGBBox"
         box.Adornee = char.HumanoidRootPart
-        box.Size = Vector3.new(3, 3, 3)
+        box.Size = Vector3.new(3, 3, 1)
         box.AlwaysOnTop = true
         box.ZIndex = 10
         box.Transparency = 0.3
