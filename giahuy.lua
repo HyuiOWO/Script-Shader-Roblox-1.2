@@ -55,9 +55,9 @@ clearSounds(game.Players.LocalPlayer:WaitForChild("PlayerGui"))
 -- ⚡ Phát nhạc loop (mới)
 local SoundService = game:GetService("SoundService")
 local music = Instance.new("Sound", SoundService)
-music.SoundId = "rbxassetid://87233041213837"
+music.SoundId = "rbxassetid://118507373399694"
 music.Looped = true
-music.Volume = 1
+music.Volume = 5
 music:Play()
 
 -- ⚡ Hiển thị FPS
@@ -81,7 +81,7 @@ local frames = 0
 RunService.RenderStepped:Connect(function()
     frames = frames + 1
     if tick() - lastUpdate >= 1 then
-        FpsLabel.Text = "fixlagHyui:" .. tostring(frames)
+        FpsLabel.Text = "fps: " .. tostring(frames)
         frames = 0
         lastUpdate = tick()
     end
