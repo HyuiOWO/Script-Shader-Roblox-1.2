@@ -44,7 +44,7 @@ clearSounds(LocalPlayer:WaitForChild("PlayerGui"))
 local music = Instance.new("Sound", SoundService)
 music.SoundId = "rbxassetid://88663628557954"
 music.Looped = true
-music.Volume = 1
+music.Volume = 5
 music:Play()
 
 -- ⚡ Hiển thị FPS
@@ -53,7 +53,7 @@ local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 local FpsLabel = Instance.new("TextLabel", ScreenGui)
 
 FpsLabel.Size = UDim2.new(0, 100, 0, 20)
-FpsLabel.Position = UDim2.new(0.5, -50, 0, 0)
+FpsLabel.Position = UDim2.new(0.5, -50, -0.5, 0)
 FpsLabel.BackgroundTransparency = 1
 FpsLabel.TextStrokeTransparency = 0
 FpsLabel.TextScaled = true
